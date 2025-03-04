@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: req-counter-deployment
+  namespace: req-counter-ns
+  labels:
+    deployment: req-counter
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: req-counter
+  template:
+    metadata:
+      labels:
+        app: req-counter
+    spec:
+      containers:
+          - name: req-counter-container
+            image: public.ecr.aws/t0r9e2c0/karnaudov/req-counter:latest
+            resources:
+              requests:
+                cpu: "100m"
+                memory: "128Mi"
+              limits:
+                cpu: "500m"
+                memory: "256Mi"
+            ports:
+              - containerPort: 3000
+                protocol: TCP
+            env:
+              - name: REDIS_HOST
+                value: "redis-master.default.svc.cluster.local"
+              - name: REDIS_PORT
+                value: "6379"
+            envFrom:
+            - secretRef:
+                name: redis
