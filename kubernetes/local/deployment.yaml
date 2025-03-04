@@ -20,11 +20,11 @@ spec:
             image: public.ecr.aws/t0r9e2c0/karnaudov/req-counter:latest
             resources:
               requests:
-                cpu: "100m"
-                memory: "128Mi"
+                cpu: "10m"
+                memory: "32Mi"
               limits:
-                cpu: "500m"
-                memory: "256Mi"
+                cpu: "150m"
+                memory: "128Mi"
             ports:
               - containerPort: 3000
                 protocol: TCP
