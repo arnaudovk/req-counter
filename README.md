@@ -1,4 +1,4 @@
-**Request Counter App on Kubernetes with Redis**
+**Request Counter App on Kubernetes**
 ================================================
 
 What the App Does
@@ -103,39 +103,31 @@ Once everything is deployed, the app should be accessible through the ALB. You c
 
 -   Ingress: An Ingress resource is used to expose the service to external traffic, providing a single entry point to the application while allowing flexible routing and load balancing.
 
--   Auto-Scaling: By using Kubernetes' Horizontal Pod Autoscaler, the system ensures that resources are allocated dynamically based on traffic load, preventing over-provisioning during low traffic periods, which helps in reducing costs.
-
 -   Efficient Redis Usage: Redis, being an in-memory data store, ensures minimal read/write latency, which translates to high performance and reduced compute resource usage.
 
 
 While the current setup addresses the requirements of the challenge, there are several areas for potential improvements:
 
-1.  Rate Limiting: Adding rate limiting on the PUT requests would help prevent abuse or accidental spikes in traffic from overloading the system.
+1.  Request Persistence: Currently, Redis is used as the data store, but it is an in-memory solution. Adding persistence mechanisms to Redis or introducing a more durable data store could improve reliability in case of Redis restarts.
 
-2.  Request Persistence: Currently, Redis is used as the data store, but it is an in-memory solution. Adding persistence mechanisms to Redis or introducing a more durable data store could improve reliability in case of Redis restarts.
+2.  Load Testing Results: Although the system is designed to handle at least 1 million requests per second, conducting formal load testing and sharing those results would help validate the system's performance claims.
 
-3.  Load Testing Results: Although the system is designed to handle at least 1 million requests per second, conducting formal load testing and sharing those results would help validate the system's performance claims.
+3.  Distributed Redis: For even better scalability and fault tolerance, consider using a Redis Cluster setup rather than the Redis in the k8s cluster.
 
-4.  Distributed Redis: For even better scalability and fault tolerance, consider using a Redis Cluster setup rather than a single Redis instance.
+6.  Logging and Monitoring: Adding centralized logging (e.g., with ELK stack or CloudWatch) and monitoring (e.g., Prometheus + Grafana) would help track the system's health and performance.
 
-5.  CI/CD Pipeline: Introducing a fully automated CI/CD pipeline with tools like GitHub Actions or Jenkins would streamline the development, testing, and deployment process.
-
-6.  Logging and Monitoring: Adding centralized logging (e.g., with ELK stack or CloudWatch) and monitoring (e.g., Prometheus + Grafana) would help track the system's health and performance, ensuring issues can be identified and addressed quickly.
-
-7.  Versioning API: For future extensibility, adding versioning to the API would allow backward compatibility as the application evolves.
-
-8.  Security Enhancements: Implementing security best practices, such as using secrets management for sensitive data, ensuring the ingress controller is properly secured, and employing network policies to control communication between services.
+8.  Security Enhancements: Implementing security best practices, such as using secrets management for sensitive data, ensuring the ingress controller is properly secured, and employing policies to control communication between services.
 
 ### Other possible solutions:
 While adding to my Kubernetes knowledge, I've found other potentially better solutions that could also be suitable:
 
-* Request Counter Middleware with Custom Ingress Controller: A custom ingress controller could handle request counter incrementation. However, this could become a bottleneck if not scalable or if it becomes blocking.
+* Request Counter Middleware with Custom Ingress Controller: A custom ingress controller could handle request counter incrementation through a middleware. However, this could become a bottleneck if not scalable or if it becomes blocking.
 
 * Service Mesh: Using a service mesh (designed to handle high throughput) could be an alternative solution for managing request counting.
 
 * Redis Master-Slave Architecture: Handle request writes only through the Redis master replica and reads through the replicas. This setup might not be ideal if replication issues arise.
 
-* Alternative Data Stores: Instead of relying on Redis, a more highly scalable database like RDS or DynamoDB could be used.
+* Alternative Data Stores: Instead of relying on Redis, a more highly scalable and persistant database like RDS or DynamoDB could be used.
 
 * Decouple Data Ingress: If real-time post-counting isn't necessary, data ingress can be decoupled and handled by a separate service that collects requests from existing monitoring tools (e.g., CloudWatch, Prometheus).
 
